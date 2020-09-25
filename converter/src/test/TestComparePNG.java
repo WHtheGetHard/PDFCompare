@@ -22,15 +22,9 @@ public class TestComparePNG {
 			compPDFInfo.setPageNumber(PDFManager.getPDFPage(compPDFInfo));
 		}
 
-		int pdfFileNumber = basePDFInfos.size();
 		String outputDir = "C:\\javaDevs_Test\\PDF_PNG_Converter\\comparePNG\\1.output";
-		for(int i = 0; i < pdfFileNumber; ++i) {
-			boolean isMatched = PDFManager.comparePDF(basePDFInfos.get(i), compPDFInfos.get(i), outputDir);
-			if (isMatched) {
-				System.out.println(basePDFInfos.get(i).getFileName() + " and " + compPDFInfos.get(i).getFileName() + " is same.");
-			} else {
-				System.out.println(basePDFInfos.get(i).getFileName() + " and " + compPDFInfos.get(i).getFileName() + " isn't same.");
-			}
-		}
+
+		String result = PDFManager.comparePDF(basePDFInfos, compPDFInfos, outputDir);
+		System.out.println(result);
 	}
 }
