@@ -125,7 +125,7 @@ public class PDFManager {
 	 * @param	比較結果を出力するフォルダのパス
 	 * @return	各PDFファイルの結果
 	 */
-	public static String comparePDF(ArrayList<PDFInfo> basePDFs, ArrayList<PDFInfo> compPDFs, String dir) {
+	public static String comparePDFs(ArrayList<PDFInfo> basePDFs, ArrayList<PDFInfo> compPDFs, String dir) {
 		StringBuilder comparedResults = new StringBuilder();
 
 		int baseFileNumbers = basePDFs.size();
