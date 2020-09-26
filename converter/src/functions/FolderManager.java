@@ -58,7 +58,7 @@ public class FolderManager {
 
 		StringBuilder differentDetail = new StringBuilder("File Number : Different.\n");
 		differentDetail.append(nonInTheOtherFolder(baseFileNames, compFileNames, true));
-		differentDetail.append(nonInTheOtherFolder(baseFileNames, compFileNames, false));
+		differentDetail.append(nonInTheOtherFolder(compFileNames, baseFileNames, false));
 
 		return differentDetail.toString();
 	}
