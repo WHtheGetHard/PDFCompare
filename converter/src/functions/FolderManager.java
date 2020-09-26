@@ -16,7 +16,7 @@ public class FolderManager {
 		ArrayList<PDFInfo> pdfInfos = new ArrayList<PDFInfo>();
 
 		File file = new File(dir);
-		File[] files = file.listFiles(filter);
+		File[] files = file.listFiles(pdfFilter);
 
 		for(File pdf_file : files) {
 			PDFInfo pdfInfo = new PDFInfo();
@@ -28,7 +28,7 @@ public class FolderManager {
 		return pdfInfos;
 	}
 
-	private static FilenameFilter filter = new FilenameFilter() {
+	private static FilenameFilter pdfFilter = new FilenameFilter() {
 		public boolean accept(File file, String str) {
 			int index = str.lastIndexOf(".");
 
@@ -41,4 +41,46 @@ public class FolderManager {
 			}
 		}
 	};
+
+	/**
+	 * @brief	2つのフォルダのPDFファイルが一致しているかを確認
+	 * @param	基準のフォルダ
+	 * @param	比較対象のフォルダ
+	 * @return	比較結果
+	 */
+	public static String hasSamePDFFiles(String baseDir, String compDir) {
+		ArrayList<String> baseFileNames = getPDFFileNames(baseDir);
+		ArrayList<String> compFileNames = getPDFFileNames(compDir);
+
+		boolean isCorresponded = baseFileNames.equals(compFileNames);
+
+		if (isCorresponded) return "File Number : Corresponded.\n";
+
+		StringBuilder differentDetail = new StringBuilder("File Number : Different.\n");
+		differentDetail.append(nonInTheOtherFolder(baseFileNames, compFileNames, true));
+		differentDetail.append(nonInTheOtherFolder(baseFileNames, compFileNames, false));
+
+		return differentDetail.toString();
+	}
+
+	private static ArrayList<String> getPDFFileNames(String dir) {
+		File file = new File(dir);
+		File[] files = file.listFiles(pdfFilter);
+		ArrayList<String> fileNames = new ArrayList<String>();
+		for(File f : files) fileNames.add(f.getName());
+
+		return fileNames;
+	}
+
+	private static String nonInTheOtherFolder(ArrayList<String> folder1, ArrayList<String> folder2, boolean isBaseFolder) {
+		StringBuilder nonList = isBaseFolder ? new StringBuilder("compDir hasn't : ") : new StringBuilder("baseDir hasn't : ");
+
+		for(String fileName : folder1) {
+			if (!folder2.contains(fileName)) nonList.append(fileName + " ");
+		}
+
+		nonList.append("\n");
+
+		return nonList.toString();
+	}
 }
