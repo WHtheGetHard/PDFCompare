@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
@@ -144,5 +145,87 @@ public class PDFManager {
 		}
 
 		return comparedResults.toString();
+	}
+
+
+	/**
+	 * 基準となるPDFファイルとcompPDFsの各PDFファイルの差異のみをpngで保存する
+	 * @param 基準となるPDFファイル
+	 * @param 比較対象のPDFファイルのリスト
+	 * @param 比較結果を出力するフォルダのパス
+	 */
+	public static void getPDFsDiff(PDFInfo basePDF, ArrayList<PDFInfo> compPDFs, String dir) {
+		for (PDFInfo compPDF : compPDFs) {
+			getPDFDiff(basePDF, compPDF, dir);
+		}
+	}
+
+	/**
+	 * 基準となるPDFファイルと比較対象のPDFファイルを比較して差異を保存する
+	 * @param 基準となるPDFファイル
+	 * @param 比較対象のPDFファイルのリスト
+	 * @param 比較結果を出力するフォルダのパス
+	 */
+	public static void getPDFDiff(PDFInfo basePDF, PDFInfo compPDF, String dir) {
+		String baseFilePath = basePDF.getFileFullPath();
+		String compFilePath = compPDF.getFileFullPath();
+
+		try (FileInputStream baseStream = new FileInputStream(baseFilePath);
+				FileInputStream compStream = new FileInputStream(compFilePath);
+				PDDocument baseDoc = PDDocument.load(baseStream);
+				PDDocument compDoc = PDDocument.load(compStream);
+				PDDocument blankDoc = new PDDocument()) {
+
+			PDFRenderer baseRend = new PDFRenderer(baseDoc);
+			PDFRenderer compRend = new PDFRenderer(compDoc);
+
+			String fileName = compPDF.getFileName();
+			int compPageNumber = compPDF.getPageNumber();
+
+			for (int i = 0; i < compPageNumber; ++i) {
+				blankDoc.addPage(new PDPage());
+			}
+			PDFRenderer blankRend = new PDFRenderer(blankDoc);
+
+			for (int i = 0; i < compPageNumber; ++i) {
+				BufferedImage baseImg = baseRend.renderImageWithDPI(i, 144, ImageType.RGB);
+				BufferedImage compImg = compRend.renderImageWithDPI(i, 144, ImageType.RGB);
+				BufferedImage blankImg = blankRend.renderImageWithDPI(i, 144, ImageType.RGB);
+
+				Path resultDir = Paths.get(dir + "\\diff-" + fileName + i + ".png");
+
+				try (OutputStream os = Files.newOutputStream(resultDir)) {
+					saveDiffImage(baseImg, compImg, blankImg, os);
+				}
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * compImgとbaseImgと異なる点のみを抜き取ってpngとして保存する
+	 * @param baseImg
+	 * @param compImg
+	 * @param blankImg
+	 * @param os
+	 * @throws IOException
+	 */
+	private static void saveDiffImage(BufferedImage baseImg, BufferedImage compImg, BufferedImage blankImg, OutputStream os) throws IOException {
+		for (int x = 0; x < baseImg.getWidth(); ++x) {
+			for (int y = 0; y < baseImg.getHeight(); ++y) {
+				int basePix = baseImg.getRGB(x, y);
+				int compPix = compImg.getRGB(x, y);
+
+				if (basePix != compPix) {
+					blankImg.setRGB(x, y, compPix);
+				}
+			}
+		}
+
+		if (os != null) {
+			ImageIO.write(blankImg, "png", os);
+		}
 	}
 }
