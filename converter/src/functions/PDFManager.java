@@ -23,7 +23,7 @@ import fieldformats.PDFInfo;
 
 public class PDFManager {
 	/**
-	 * @brief	対象のPDFファイルのページ数を取得する
+	 * 対象のPDFファイルのページ数を取得する
 	 * @param	ページ数を取得したいPDFInfo
 	 * @return	ページ数
 	 */
@@ -40,29 +40,36 @@ public class PDFManager {
 		return pageNumber;
 	}
 
-	private static boolean compareImage(BufferedImage baseImg, BufferedImage compImg, OutputStream os) throws IOException {
-		boolean matched = true;
-		for(int x = 0; x < baseImg.getWidth(); ++x) {
-			for(int y = 0; y < baseImg.getHeight(); ++y) {
-				int basePix = baseImg.getRGB(x, y);
-				int compPix = compImg.getRGB(x, y);
+	/**
+	 * 2つのPDFリストをビジュアルで比較して、比較結果をページ単位でpngで出力する
+	 * @param	基準となるPDFファイルのリスト
+	 * @param	比較対象のPDFファイルのリスト
+	 * @param	比較結果を出力するフォルダのパス
+	 * @return	各PDFファイルの結果
+	 */
+	public static String comparePDFs(ArrayList<PDFInfo> basePDFs, ArrayList<PDFInfo> compPDFs, String dir) {
+		StringBuilder comparedResults = new StringBuilder();
 
-				if (basePix != compPix) {
-					matched = false;
-					compImg.setRGB(x,  y, Color.MAGENTA.getRGB());
-				}
+		int baseFileNumbers = basePDFs.size();
+		int compFileNumbers = compPDFs.size();
+
+		for(int baseCounter = 0; baseCounter < baseFileNumbers; ++baseCounter) {
+			for(int compCounter = 0; compCounter < compFileNumbers; ++compCounter) {
+				String baseFileName = basePDFs.get(baseCounter).getFileName();
+				String compFileName = compPDFs.get(compCounter).getFileName();
+
+				if (baseFileName == null) continue;
+				if (!baseFileName.equals(compFileName)) continue;
+
+				comparedResults.append(comparePDF(basePDFs.get(baseCounter), compPDFs.get(compCounter), dir));
 			}
 		}
 
-		if (os != null) {
-			ImageIO.write(compImg, "png", os);
-		}
-
-		return matched;
+		return comparedResults.toString();
 	}
 
 	/**
-	 * @brief	2つのPDFをビジュアルで比較して、比較結果をページ単位でpngで出力する
+	 * 2つのPDFをビジュアルで比較して、比較結果をページ単位でpngで出力する
 	 * @param	基準となるPDFファイル
 	 * @param	比較対象のPDFファイル
 	 * @param	比較結果を出力するフォルダのパス
@@ -120,31 +127,32 @@ public class PDFManager {
 	}
 
 	/**
-	 * @brief	2つのPDFリストをビジュアルで比較して、比較結果をページ単位でpngで出力する
-	 * @param	基準となるPDFファイルのリスト
-	 * @param	比較対象のPDFファイルのリスト
-	 * @param	比較結果を出力するフォルダのパス
-	 * @return	各PDFファイルの結果
+	 * 2つのイメージを比較して、差異箇所をマジェンタにする
+	 * @param	基準となるイメージ
+	 * @param	比較対象となるイメージ
+	 * @param	出力先
+	 * @return	2つのイメージに差異があるかどうか
+	 * @throws	IOException
 	 */
-	public static String comparePDFs(ArrayList<PDFInfo> basePDFs, ArrayList<PDFInfo> compPDFs, String dir) {
-		StringBuilder comparedResults = new StringBuilder();
+	private static boolean compareImage(BufferedImage baseImg, BufferedImage compImg, OutputStream os) throws IOException {
+		boolean matched = true;
+		for(int x = 0; x < baseImg.getWidth(); ++x) {
+			for(int y = 0; y < baseImg.getHeight(); ++y) {
+				int basePix = baseImg.getRGB(x, y);
+				int compPix = compImg.getRGB(x, y);
 
-		int baseFileNumbers = basePDFs.size();
-		int compFileNumbers = compPDFs.size();
-
-		for(int baseCounter = 0; baseCounter < baseFileNumbers; ++baseCounter) {
-			for(int compCounter = 0; compCounter < compFileNumbers; ++compCounter) {
-				String baseFileName = basePDFs.get(baseCounter).getFileName();
-				String compFileName = compPDFs.get(compCounter).getFileName();
-
-				if (baseFileName == null) continue;
-				if (!baseFileName.equals(compFileName)) continue;
-
-				comparedResults.append(comparePDF(basePDFs.get(baseCounter), compPDFs.get(compCounter), dir));
+				if (basePix != compPix) {
+					matched = false;
+					compImg.setRGB(x,  y, Color.MAGENTA.getRGB());
+				}
 			}
 		}
 
-		return comparedResults.toString();
+		if (os != null) {
+			ImageIO.write(compImg, "png", os);
+		}
+
+		return matched;
 	}
 
 

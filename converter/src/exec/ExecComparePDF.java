@@ -7,7 +7,7 @@ import fieldformats.PDFInfo;
 import functions.FolderManager;
 import functions.PDFManager;
 
-public class Main {
+public class ExecComparePDF {
 	public static void main(String[]args) {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Input base folder: ");
