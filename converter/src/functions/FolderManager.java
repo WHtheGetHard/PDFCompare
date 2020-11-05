@@ -8,7 +8,7 @@ import fieldformats.PDFInfo;
 
 public class FolderManager {
 	/**
-	 * @brief	フォルダからPDFファイル一覧を取得する
+	 * フォルダからPDFファイル一覧を取得する
 	 * @param	PDFファイルがあるフォルダ
 	 * @return	フォルダ内のPDFファイルの情報一覧
 	 */
@@ -43,7 +43,32 @@ public class FolderManager {
 	};
 
 	/**
-	 * @brief	2つのフォルダのPDFファイルが一致しているかを確認
+	 * フォルダからimage一覧を取得する
+	 * @param	imageファイルがあるフォルダ
+	 * @return	フォルダ内のimageファイル一覧
+	 */
+	public static File[] getImageFiles(String dir) {
+		File file = new File(dir);
+		File[] files = file.listFiles(imageFilter);
+		return files;
+	}
+
+	private static FilenameFilter imageFilter = new FilenameFilter() {
+		public boolean accept(File file, String str) {
+			int index = str.lastIndexOf(".");
+
+			String ext = str.substring(index+1).toLowerCase();
+
+			if ("png".equals(ext) || "jpg".equals(ext)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	};
+
+	/**
+	 * 2つのフォルダのPDFファイルが一致しているかを確認
 	 * @param	基準のフォルダ
 	 * @param	比較対象のフォルダ
 	 * @return	比較結果
