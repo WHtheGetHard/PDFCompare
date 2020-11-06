@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import fieldformats.PDFInfo;
 import functions.FolderHandler;
-import functions.PDFManager;
+import functions.PDFHandler;
 
 public class ExecComparePDF {
 	public static void main(String[]args) {
@@ -22,15 +22,15 @@ public class ExecComparePDF {
 
 		ArrayList<PDFInfo> basePDFs = FolderHandler.getPDFFiles(baseDir);
 		for(PDFInfo pdfInfo : basePDFs) {
-			pdfInfo.setPageNumber(PDFManager.getPDFPage(pdfInfo));
+			pdfInfo.setPageNumber(PDFHandler.getPDFPage(pdfInfo));
 		}
 
 		ArrayList<PDFInfo> compPDFs = FolderHandler.getPDFFiles(compDir);
 		for(PDFInfo pdfInfo : compPDFs) {
-			pdfInfo.setPageNumber(PDFManager.getPDFPage(pdfInfo));
+			pdfInfo.setPageNumber(PDFHandler.getPDFPage(pdfInfo));
 		}
 
-		comparedResult.append(PDFManager.comparePDFs(basePDFs, compPDFs, outputDir));
+		comparedResult.append(PDFHandler.comparePDFs(basePDFs, compPDFs, outputDir));
 
 		sc.close();
 

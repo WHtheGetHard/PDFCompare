@@ -1,6 +1,5 @@
 package functions;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,8 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -21,7 +18,7 @@ import fieldformats.PDFInfo;
 ;
 
 
-public class PDFManager {
+public class PDFHandler {
 	/**
 	 * 対象のPDFファイルのページ数を取得する
 	 * @param	ページ数を取得したいPDFInfo
@@ -107,9 +104,9 @@ public class PDFManager {
 				try (OutputStream os = Files.newOutputStream(resultDir)) {
 
 					if (isSameAppearance) {
-						isSameAppearance = compareImage(baseImg, compImg,os);
+						isSameAppearance = ImageHandler.compareImage(baseImg, compImg,os);
 					} else {
-						compareImage(baseImg, compImg, os);
+						ImageHandler.compareImage(baseImg, compImg, os);
 					}
 				}
 			}
@@ -124,35 +121,6 @@ public class PDFManager {
 		}
 
 		return comparedResult.toString();
-	}
-
-	/**
-	 * 2つのイメージを比較して、差異箇所をマジェンタにする
-	 * @param	基準となるイメージ
-	 * @param	比較対象となるイメージ
-	 * @param	出力先
-	 * @return	2つのイメージに差異があるかどうか
-	 * @throws	IOException
-	 */
-	private static boolean compareImage(BufferedImage baseImg, BufferedImage compImg, OutputStream os) throws IOException {
-		boolean matched = true;
-		for(int x = 0; x < baseImg.getWidth(); ++x) {
-			for(int y = 0; y < baseImg.getHeight(); ++y) {
-				int basePix = baseImg.getRGB(x, y);
-				int compPix = compImg.getRGB(x, y);
-
-				if (basePix != compPix) {
-					matched = false;
-					compImg.setRGB(x,  y, Color.MAGENTA.getRGB());
-				}
-			}
-		}
-
-		if (os != null) {
-			ImageIO.write(compImg, "png", os);
-		}
-
-		return matched;
 	}
 
 
@@ -203,37 +171,12 @@ public class PDFManager {
 				Path resultDir = Paths.get(dir + "\\diff-" + fileName + i + ".png");
 
 				try (OutputStream os = Files.newOutputStream(resultDir)) {
-					saveDiffImage(baseImg, compImg, blankImg, os);
+					ImageHandler.saveDiffImage(baseImg, compImg, blankImg, os);
 				}
 
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * compImgとbaseImgと異なる点のみを抜き取ってpngとして保存する
-	 * @param baseImg
-	 * @param compImg
-	 * @param blankImg
-	 * @param os
-	 * @throws IOException
-	 */
-	private static void saveDiffImage(BufferedImage baseImg, BufferedImage compImg, BufferedImage blankImg, OutputStream os) throws IOException {
-		for (int x = 0; x < baseImg.getWidth(); ++x) {
-			for (int y = 0; y < baseImg.getHeight(); ++y) {
-				int basePix = baseImg.getRGB(x, y);
-				int compPix = compImg.getRGB(x, y);
-
-				if (basePix != compPix) {
-					blankImg.setRGB(x, y, compPix);
-				}
-			}
-		}
-
-		if (os != null) {
-			ImageIO.write(blankImg, "png", os);
 		}
 	}
 }

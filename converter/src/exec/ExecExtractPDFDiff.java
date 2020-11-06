@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import fieldformats.PDFInfo;
 import functions.FolderHandler;
-import functions.PDFManager;
+import functions.PDFHandler;
 import functions.ReadImageText;
 import net.sourceforge.tess4j.TesseractException;
 
@@ -18,14 +18,14 @@ public class ExecExtractPDFDiff {
 
 
 		PDFInfo basePDF = FolderHandler.getPDFFiles(baseDir).get(0);
-		basePDF.setPageNumber(PDFManager.getPDFPage(basePDF));
+		basePDF.setPageNumber(PDFHandler.getPDFPage(basePDF));
 
 		ArrayList<PDFInfo> compPDFs = FolderHandler.getPDFFiles(compDir);
 		for (PDFInfo pdfInfo : compPDFs) {
-			pdfInfo.setPageNumber(PDFManager.getPDFPage(pdfInfo));
+			pdfInfo.setPageNumber(PDFHandler.getPDFPage(pdfInfo));
 		}
 
-		PDFManager.getPDFsDiff(basePDF, compPDFs, outputDir);
+		PDFHandler.getPDFsDiff(basePDF, compPDFs, outputDir);
 
 		File[] imageFiles = FolderHandler.getImageFiles(outputDir);
 
