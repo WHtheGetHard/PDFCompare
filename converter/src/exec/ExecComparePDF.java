@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import fieldformats.PDFInfo;
-import functions.FolderManager;
+import functions.FolderHandler;
 import functions.PDFManager;
 
 public class ExecComparePDF {
@@ -18,14 +18,14 @@ public class ExecComparePDF {
 		String outputDir = sc.nextLine();
 
 		StringBuilder comparedResult = new StringBuilder();
-		comparedResult.append(FolderManager.hasSamePDFFiles(baseDir, compDir));
+		comparedResult.append(FolderHandler.hasSamePDFFiles(baseDir, compDir));
 
-		ArrayList<PDFInfo> basePDFs = FolderManager.getPDFFiles(baseDir);
+		ArrayList<PDFInfo> basePDFs = FolderHandler.getPDFFiles(baseDir);
 		for(PDFInfo pdfInfo : basePDFs) {
 			pdfInfo.setPageNumber(PDFManager.getPDFPage(pdfInfo));
 		}
 
-		ArrayList<PDFInfo> compPDFs = FolderManager.getPDFFiles(compDir);
+		ArrayList<PDFInfo> compPDFs = FolderHandler.getPDFFiles(compDir);
 		for(PDFInfo pdfInfo : compPDFs) {
 			pdfInfo.setPageNumber(PDFManager.getPDFPage(pdfInfo));
 		}

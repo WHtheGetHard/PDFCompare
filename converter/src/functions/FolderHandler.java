@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import fieldformats.PDFInfo;
 
-public class FolderManager {
+public class FolderHandler {
 	/**
 	 * フォルダからPDFファイル一覧を取得する
 	 * @param	PDFファイルがあるフォルダ
@@ -34,11 +34,7 @@ public class FolderManager {
 
 			String ext = str.substring(index+1).toLowerCase();
 
-			if ("pdf".equals(ext)) {
-				return true;
-			} else {
-				return false;
-			}
+			return "pdf".equals(ext) ? true : false;
 		}
 	};
 
@@ -59,11 +55,7 @@ public class FolderManager {
 
 			String ext = str.substring(index+1).toLowerCase();
 
-			if ("png".equals(ext) || "jpg".equals(ext)) {
-				return true;
-			} else {
-				return false;
-			}
+			return ("png".equals(ext) || "jpg".equals(ext)) ? true : false;
 		}
 	};
 
