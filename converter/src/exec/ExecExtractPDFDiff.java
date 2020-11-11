@@ -12,9 +12,9 @@ import net.sourceforge.tess4j.TesseractException;
 
 public class ExecExtractPDFDiff {
 	public static void main(String[] args) throws IOException, TesseractException {
-		String baseDir = "C:\\javaDevs_Test\\PDF_PNG_Converter\\Test_getPDFsDiff\\0.input\\0.base";
-		String compDir = "C:\\javaDevs_Test\\PDF_PNG_Converter\\Test_getPDFsDiff\\0.input\\1.comp";
-		String outputDir = "C:\\javaDevs_Test\\PDF_PNG_Converter\\Test_getPDFsDiff\\1.output";
+		String baseDir = "C:\\javaDevs_Test\\PDF_PNG_Converter\\Test_ExecExtractPDFDiff\\0.input\\0.base";
+		String compDir = "C:\\javaDevs_Test\\PDF_PNG_Converter\\Test_ExecExtractPDFDiff\\0.input\\1.comp";
+		String outputDir = "C:\\javaDevs_Test\\PDF_PNG_Converter\\Test_ExecExtractPDFDiff\\1.output";
 
 
 		PDFInfo basePDF = FolderHandler.getPDFFiles(baseDir).get(0);

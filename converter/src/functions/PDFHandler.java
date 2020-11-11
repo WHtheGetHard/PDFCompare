@@ -14,6 +14,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
+import fieldformats.PDFFieldCordinations;
 import fieldformats.PDFInfo;
 ;
 
@@ -178,5 +179,75 @@ public class PDFHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	// 以下テスト
+	/**
+	 * フィールドの範囲のみをPNGとして保存する
+	 * @param フィールド範囲のリスト
+	 * @param 比較対象のPDFファイルのリスト
+	 * @param 比較結果を出力するフォルダのパス
+	 */
+	public static void saveCompFieldPart(ArrayList<PDFFieldCordinations> pdfFieldCordinationsList, ArrayList<PDFInfo> compPDFs, String dir) {
+		for (PDFInfo compPDF : compPDFs) {
+			String compFilePath = compPDF.getFileFullPath();
+
+			try (FileInputStream compStream = new FileInputStream(compFilePath);
+					PDDocument compDoc = PDDocument.load(compStream);
+					PDDocument blankDoc = new PDDocument()) {
+
+				PDFRenderer compRend = new PDFRenderer(compDoc);
+
+				String fileName = compPDF.getFileName();
+				int compPageNumber = compPDF.getPageNumber();
+
+				for (int i = 0; i < compPageNumber; ++i) {
+					blankDoc.addPage(new PDPage());
+				}
+
+				PDFRenderer blankRend = new PDFRenderer(blankDoc);
+
+				for (int i = 0; i < compPageNumber; ++i) {
+					BufferedImage compImg = compRend.renderImageWithDPI(i, 144, ImageType.RGB);
+					BufferedImage blankImg = blankRend.renderImageWithDPI(i, 144, ImageType.RGB);
+
+					ImageHandler.saveInputField(pdfFieldCordinationsList, compImg, blankImg, dir, fileName);
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 原本からフィールドのリストを取得する
+	 * @param	原本のPDFファイル
+	 * @return	原本のフィールドリスト
+	 */
+	public static ArrayList<PDFFieldCordinations> getFieldRange(PDFInfo basePDF) {
+		ArrayList<PDFFieldCordinations> pdfFieldCordinationsList = new ArrayList<PDFFieldCordinations>();
+
+		String filePath = basePDF.getFileFullPath();
+
+		try (FileInputStream baseStream = new FileInputStream(filePath);
+				PDDocument baseDoc = PDDocument.load(baseStream)) {
+
+			int pageNumber = basePDF.getPageNumber();
+
+
+			PDFRenderer baseRend = new PDFRenderer(baseDoc);
+
+			for (int i = 0; i < pageNumber; ++i) {
+				BufferedImage baseImg = baseRend.renderImageWithDPI(i, 144, ImageType.RGB);
+
+				pdfFieldCordinationsList = ImageHandler.getFieldPartList(baseImg);
+			}
+
+		} catch (IOException e) {
+
+		}
+
+		return pdfFieldCordinationsList;
 	}
 }
