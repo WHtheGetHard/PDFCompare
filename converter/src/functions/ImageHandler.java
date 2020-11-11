@@ -11,6 +11,11 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
 import fieldformats.PDFFieldCordinations;
 
 public class ImageHandler {
@@ -70,7 +75,7 @@ public class ImageHandler {
 
 	// 以下テスト
 	/**
-	 * イメージからフィールド（灰色：RGBが-3092786）のリストを取得する
+	 * イメージからフィールド（灰色：RGBが-5264469）のリストを取得する
 	 * @param	フィールドが定義されている原本のイメージバッファ
 	 * @return	フィールドの範囲で表されるリスト
 	 */
@@ -155,19 +160,26 @@ public class ImageHandler {
 	 * @param outputDir
 	 * @param compFileName
 	 */
-	public static void saveInputField(ArrayList<PDFFieldCordinations> pdfFieldCordinationsList, BufferedImage compImg, BufferedImage blankImg, String outputDir, String compFileName) {
+	public static void saveInputField(ArrayList<PDFFieldCordinations> pdfFieldCordinationsList, BufferedImage compImg, String outputDir, String compFileName) {
 		int counter = 0;
 		for (PDFFieldCordinations pdfFieldCordinations : pdfFieldCordinationsList) {
 			Path resultDir = Paths.get(outputDir + "\\Diff-" + compFileName + counter + ".png");
 
-			for (int x = pdfFieldCordinations.getStartX(); x < pdfFieldCordinations.getEndX(); ++x) {
-				for (int y = pdfFieldCordinations.getStartY(); y < pdfFieldCordinations.getEndY(); ++y) {
-					blankImg.setRGB(x, y, compImg.getRGB(x, y));
-				}
-			}
+			try (PDDocument blankDoc = new PDDocument()) {
+				blankDoc.addPage(new PDPage());
 
-			try (OutputStream os = Files.newOutputStream(resultDir)) {
-				ImageIO.write(blankImg, ".png", os);
+				PDFRenderer blankRend = new PDFRenderer(blankDoc);
+				BufferedImage blankImg = blankRend.renderImageWithDPI(0, 144, ImageType.RGB);
+
+				for (int x = pdfFieldCordinations.getStartX(); x < pdfFieldCordinations.getEndX(); ++x) {
+					for (int y = pdfFieldCordinations.getStartY(); y < pdfFieldCordinations.getEndY(); ++y) {
+						blankImg.setRGB(x, y, compImg.getRGB(x, y));
+					}
+				}
+
+				try (OutputStream os = Files.newOutputStream(resultDir)) {
+					ImageIO.write(blankImg, "png", os);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -193,8 +193,7 @@ public class PDFHandler {
 			String compFilePath = compPDF.getFileFullPath();
 
 			try (FileInputStream compStream = new FileInputStream(compFilePath);
-					PDDocument compDoc = PDDocument.load(compStream);
-					PDDocument blankDoc = new PDDocument()) {
+					PDDocument compDoc = PDDocument.load(compStream)) {
 
 				PDFRenderer compRend = new PDFRenderer(compDoc);
 
@@ -202,16 +201,9 @@ public class PDFHandler {
 				int compPageNumber = compPDF.getPageNumber();
 
 				for (int i = 0; i < compPageNumber; ++i) {
-					blankDoc.addPage(new PDPage());
-				}
-
-				PDFRenderer blankRend = new PDFRenderer(blankDoc);
-
-				for (int i = 0; i < compPageNumber; ++i) {
 					BufferedImage compImg = compRend.renderImageWithDPI(i, 144, ImageType.RGB);
-					BufferedImage blankImg = blankRend.renderImageWithDPI(i, 144, ImageType.RGB);
 
-					ImageHandler.saveInputField(pdfFieldCordinationsList, compImg, blankImg, dir, fileName);
+					ImageHandler.saveInputField(pdfFieldCordinationsList, compImg, dir, fileName);
 				}
 
 			} catch (IOException e) {
