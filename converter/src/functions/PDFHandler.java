@@ -1,5 +1,6 @@
 package functions;
 
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
 
 import fieldformats.PDFFieldCordinations;
 import fieldformats.PDFInfo;
@@ -241,5 +243,41 @@ public class PDFHandler {
 		}
 
 		return pdfFieldCordinationsList;
+	}
+
+	/**
+	 *
+	 * @param pdfFieldCordinationsList
+	 * @param compPDF
+	 * @return
+	 */
+	public static ArrayList<String> getFieldText(ArrayList<PDFFieldCordinations> pdfFieldCordinationsList, ArrayList<PDFInfo> compPDFList) {
+		ArrayList<String> textList = new ArrayList<String>();
+
+		for (PDFInfo compPDF : compPDFList) {
+			String filePath = compPDF.getFileFullPath();
+
+			try (FileInputStream compStream = new FileInputStream(filePath);
+					PDDocument compDoc = PDDocument.load(compStream)) {
+				for (int i = 0; i < compPDF.getPageNumber(); ++i) {
+					for (PDFFieldCordinations pdfFieldCordinations : pdfFieldCordinationsList) {
+						double x = pdfFieldCordinations.getStartX();
+						double y = pdfFieldCordinations.getStartY();
+						double w = pdfFieldCordinations.getEndX() - pdfFieldCordinations.getStartX();
+						double h = pdfFieldCordinations.getEndY() - pdfFieldCordinations.getStartY();
+
+						Rectangle2D area = new Rectangle2D.Double(x, y, w, h);
+
+						PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+						stripper.addRegion("list", area);
+						stripper.extractRegions(compDoc.getPage(i));
+						textList.add(stripper.getTextForRegion("list"));
+					}
+				}
+			} catch (IOException e) {
+
+			}
+		}
+		return textList;
 	}
 }
